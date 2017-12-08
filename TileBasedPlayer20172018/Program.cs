@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace TileBasedPlayer20172018
+namespace Tiler
 {
 #if WINDOWS || LINUX
     /// <summary>

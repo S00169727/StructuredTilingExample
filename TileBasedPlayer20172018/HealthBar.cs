@@ -19,8 +19,7 @@ namespace Helpers
         {
             get
             {
-                return new Rectangle((int)position.X , 
-                                (int)position.Y , health, 10);
+                return new Rectangle((int)position.X, (int)position.Y, health, 10);
             }
         }
 
@@ -32,17 +31,24 @@ namespace Helpers
 
         }
 
-        public void draw(SpriteBatch spriteBatch)
+        public void Draw(SpriteBatch spriteBatch)
         {
             
             spriteBatch.Begin(SpriteSortMode.Immediate,
                     BlendState.AlphaBlend, null, null, null, null, Camera.CurrentCameraTranslation);
             if (health > 60)
+            {
                 spriteBatch.Draw(txHealthBar, HealthRect, Color.Green);
+            }
             else if (health > 30 && health <= 60)
+            {
                 spriteBatch.Draw(txHealthBar, HealthRect, Color.Orange);
+            }
             else if (health > 0 && health <= 30)
+            {
                 spriteBatch.Draw(txHealthBar, HealthRect, Color.Red);
+            }
+            
             spriteBatch.End();
         }
 

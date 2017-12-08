@@ -1,53 +1,64 @@
-﻿using CameraNS;
+﻿using AnimatedSprite;
+using CameraNS;
 using Engine.Engines;
+using Helpers;
 using Microsoft.Xna.Framework;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
 using System.Collections.Generic;
+using TileBasedPlayer20172018;
 using Tiler;
 using Tiling;
 
-namespace TileBasedPlayer20172018
+namespace Tiler
 {
     /// <summary>
     /// This is the main type for your game.
     /// </summary>
     public class Game1 : Game
     {
+        int health = 100;
+        TilePlayer player;
         GraphicsDeviceManager graphics;
         SpriteBatch spriteBatch;
+        Sentry sentryTurret;
+        HealthBar hbar;
         int tileWidth = 64;
         int tileHeight = 64;
+        List<Sentry> sentryList = new List<Sentry>();
         List<TileRef> TileRefs = new List<TileRef>();
         List<Collider> colliders = new List<Collider>();
-        string[] backTileNames = { "blue box", "pavement", "ground", "blue", "home" };
-        public enum TileType { BLUEBOX, PAVEMENT, GROUND, BLUE,HOME };
+        string[] backTileNames = { "blue box", "pavement", "blue steel", "green box", "home", "end" };
+        public enum TileType { BLUEBOX, PAVEMENT, BLUESTEEL, GREENBOX, HOME, END };
         int[,] tileMap = new int[,]
     {
-        {1,2,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {1,2,3,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {1,1,1,1,1,1,1,1,1,1,1,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2},
-        {2,1,1,2,2,2,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2},
-        {2,2,2,2,2,2,0,0,1,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2},
-        {2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,2,0,0,0,0,0,2,0,0,0,0,2,0,0,0,2,0,0,0,2,2,2,2,3,2,2,2,2},
-        {2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,3,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {2,2,2,2,2,2,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
-        {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,2,1,1,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,2,2,2,2,2,2},
-        {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,3,2,1,1,2,2,2,4,1,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
+        {4,2,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
+        {1,2,2,2,2,2,1,1,2,2,2,0,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1},
+        {1,1,1,1,1,1,1,1,1,1,1,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1},
+        {1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,2,2,2,2,2,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,3,1,1,1,0,0,0,0,2,2,2,2,2,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,1,1,1,0,0,0,0,2,2,2,2,2,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,0,0,0,3,0,0,0,1,1,0,0,0,0,2,0,0,0,0,0,3,0,0,0,0,0,1,1,1,0,3,0,0,2,2,2,2,3,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,3,0,0,0,0,0,3,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,0,0,0,0,0,0,0,1,1,1,1,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,3,2,2,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,0,0,0,3,0,0,0,1,1,1,1,2,2,2,1,1,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,3,2,1,1,2,2,2,2,1,2,2,2,2,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1},
+        {0,0,0,0,0,0,0,0,0,2,2,2,2,2,2,2,2,2,2,2,1,1,2,2,2,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1},
+        {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,1,1},
         {1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
         {2,2,3,2,2,2,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,3,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
-        {2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
+        {5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     };
+
         public Game1()
         {
             graphics = new GraphicsDeviceManager(this);
             Content.RootDirectory = "Content";
+            graphics.PreferredBackBufferWidth = 1920;
+            graphics.PreferredBackBufferHeight = 1080;
         }
 
         /// <summary>
@@ -62,19 +73,7 @@ namespace TileBasedPlayer20172018
             new Camera(this, Vector2.Zero, 
                 new Vector2(tileMap.GetLength(1) * tileWidth, tileMap.GetLength(0) * tileHeight));
             new InputEngine(this);
-            Services.AddService(new TilePlayer(this, new Vector2(64, 128), new List<TileRef>()
-            {
-                new TileRef(15, 2, 0),
-                new TileRef(15, 3, 0),
-                new TileRef(15, 4, 0),
-                new TileRef(15, 5, 0),
-                new TileRef(15, 6, 0),
-                new TileRef(15, 7, 0),
-                new TileRef(15, 8, 0),
-            }, 64, 64, 0f));
-            SetColliders(TileType.GROUND);
-            SetColliders(TileType.BLUEBOX);
-
+            
             base.Initialize();
         }
 
@@ -88,18 +87,87 @@ namespace TileBasedPlayer20172018
             spriteBatch = new SpriteBatch(GraphicsDevice);
             Services.AddService(spriteBatch);
             Services.AddService(Content.Load<Texture2D>(@"Tiles/tank tiles 64 x 64"));
-
+            
             // Tile References to be drawn on the Map corresponding to the entries in the defined 
             // Tile Map
-            // "free", "pavement", "ground", "blue", "home" 
+            // "free", "pavement", "ground", "blue", "home", "grass" "end"
             TileRefs.Add(new TileRef(4, 2, 0));
             TileRefs.Add(new TileRef(3, 3, 1));
             TileRefs.Add(new TileRef(6, 3, 2));
             TileRefs.Add(new TileRef(6, 2, 3));
             TileRefs.Add(new TileRef(0, 2, 4));
+            TileRefs.Add(new TileRef(0, 1, 5));
+            TileRefs.Add(new TileRef(0, 4, 6));
             // Names fo the Tiles
             
             new SimpleTileLayer(this, backTileNames, tileMap, TileRefs, tileWidth, tileHeight);
+            List<Tile> found = SimpleTileLayer.getNamedTiles("home");
+            
+            new SimpleTileLayer(this, backTileNames, tileMap, TileRefs, tileWidth, tileHeight);
+            List<Tile> foundSentry = SimpleTileLayer.getNamedTiles(backTileNames[(int)TileType.GREENBOX]);
+
+            Services.AddService(new TilePlayer(this, new Vector2((int)TileType.HOME), new List<TileRef>()
+            {
+                new TileRef(15, 2, 0),
+                new TileRef(15, 3, 0),
+                new TileRef(15, 4, 0),
+                new TileRef(15, 5, 0),
+                new TileRef(15, 6, 0),
+                new TileRef(15, 7, 0),
+                new TileRef(15, 8, 0),
+            }, 64, 64, 0f));
+            SetColliders(TileType.GREENBOX);
+            SetColliders(TileType.BLUEBOX);
+
+            TilePlayer tilePlayer = Services.GetService<TilePlayer>();
+
+            tilePlayer.AddHealthBar(new HealthBar(tilePlayer.Game, tilePlayer.PixelPosition));
+
+            player = (TilePlayer)Services.GetService(typeof(TilePlayer));
+
+            Projectile playerProjectile = new Projectile(this, new List<TileRef>()
+            {
+                new TileRef(8, 0, 0)
+            },
+
+            new AnimateSheetSprite(this, player.PixelPosition, new List<TileRef>()
+            {
+                new TileRef(0, 0, 0),
+                new TileRef(1, 0, 1),
+                new TileRef(2, 0, 2)
+            }, 64, 64, 0), player.PixelPosition, 1);
+            player.LoadProjectile(playerProjectile);
+
+
+            for (int i = 0; i < foundSentry.Count; i++)
+            {
+                sentryTurret = new Sentry(this, new Vector2(foundSentry[i].X * tileWidth, foundSentry[i].Y * tileHeight), new List<TileRef>()
+                {
+                    new TileRef(20,2,0),
+                    new TileRef(20,3,0),
+                    new TileRef(20,4,0),
+                    new TileRef(20,5,0),
+                    new TileRef(20,6,0),
+                    new TileRef(20,6,0),
+                    new TileRef(20,8,0),
+                }, 64,64, 0);
+                sentryList.Add(sentryTurret);
+            }
+
+            for (int i = 0; i < sentryList.Count; i++)
+            {
+                Projectile projectile = new Projectile(this, new List<TileRef>() {
+                new TileRef(8, 0, 0)
+                },
+                new AnimateSheetSprite(this, sentryList[i].PixelPosition, new List<TileRef>() {
+                    new TileRef(0, 0, 0),
+                    new TileRef(1, 0, 1),
+                    new TileRef(2, 0, 2)
+                }, 64, 64, 0), sentryList[i].PixelPosition, 1);
+
+                sentryList[i].LoadProjectile(projectile);
+                sentryList[i].Health = 20;
+            }
             // TODO: use this.Content to load your game content here
         }
 
@@ -124,7 +192,7 @@ namespace TileBasedPlayer20172018
         /// </summary>
         protected override void UnloadContent()
         {
-            // TODO: Unload any non ContentManager content here
+
         }
 
         /// <summary>
@@ -137,7 +205,26 @@ namespace TileBasedPlayer20172018
             if (GamePad.GetState(PlayerIndex.One).Buttons.Back == ButtonState.Pressed || Keyboard.GetState().IsKeyDown(Keys.Escape))
                 Exit();
 
-            // TODO: Add your update logic here
+            for (int i = 0; i < sentryList.Count; i++)
+            {
+                sentryList[i].Follow((AnimateSheetSprite)player);
+
+                if (sentryList[i].sentryProjectile.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && sentryList[i].sentryProjectile.collisionDetect(player))
+                {
+                    if (!sentryList[i].sentryProjectile.hit)
+                        player.Health -= 20;
+                    sentryList[i].sentryProjectile.hit = true;
+                }
+
+                if (player.playerProjectle.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && player.playerProjectle.collisionDetect(sentryList[i]))
+                {
+                    if (!player.playerProjectle.hit)
+                    {
+                        sentryList[i].Die();
+                        player.playerProjectle.hit = true;
+                    }
+                }
+            }
 
             base.Update(gameTime);
         }
@@ -154,5 +241,6 @@ namespace TileBasedPlayer20172018
 
             base.Draw(gameTime);
         }
+        
     }
 }

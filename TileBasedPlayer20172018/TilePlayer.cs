@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using TileBasedPlayer20172018;
 using Tiling;
 
 namespace Tiler
@@ -13,8 +14,15 @@ namespace Tiler
 
     public class TilePlayer : RotatingSprite
     {
-        //List<TileRef> images = new List<TileRef>() { new TileRef(15, 2, 0)};
-        //TileRef currentFrame;
+        public Projectile playerProjectle;
+
+        public void LoadProjectile(Projectile p)
+        {
+            playerProjectle = p;
+        }
+
+        List<TileRef> images = new List<TileRef>() { new TileRef(15, 2, 0)};
+        TileRef currentFrame;
         int speed = 5;
         float turnspeed = 0.03f;
         public Vector2 previousPosition;

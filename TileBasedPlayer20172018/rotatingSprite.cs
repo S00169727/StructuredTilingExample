@@ -20,6 +20,7 @@ namespace AnimatedSprite
         private Rectangle range;
         protected int tileRangeDistance = 4;
         protected float rotationSpeed = .5f;
+
         public Rectangle Range
         {
             get
@@ -61,29 +62,32 @@ namespace AnimatedSprite
         }
 
         HealthBar hbar;
+        private Texture2D texture2D;
+        private Game g;
+        private Texture2D texture;
+        private Vector2 userPosition;
+        private int framecount;
 
         public RotatingSprite(Game game, Vector2 userPosition, List<TileRef> sheetRefs, int frameWidth, int frameHeight, float layerDepth)
             : base(game,userPosition, sheetRefs, frameWidth, frameHeight, layerDepth)
         {
             
         }
-
+        
         public void AddHealthBar(HealthBar h)
         {
             Hbar = h;
         }
 
-        public virtual void follow(AnimateSheetSprite followed)
+        public virtual void Follow(AnimateSheetSprite followed)
         {
             // Only rotate towards the player if he enters the field of View
             if (followed.BoundingRectangle.Intersects(Range))
                 angleOfRotation = TurnToFace(followed.PixelPosition, PixelPosition, angleOfRotation, rotationSpeed);
-                        
         }
 
-        public void followPosition(Vector2 Pos)
+        public void FollowPosition(Vector2 Pos)
         {
-            
             angleOfRotation = TurnToFace( Pos, PixelPosition, angleOfRotation, rotationSpeed);
         }
 
@@ -119,14 +123,14 @@ namespace AnimatedSprite
         public override void Draw(GameTime gameTime)
         {
             if (Hbar != null)
-                Hbar.draw(Game.Services.GetService<SpriteBatch>());
+                Hbar.Draw(Game.Services.GetService<SpriteBatch>());
             base.Draw(gameTime);
         }
         /// <summary>
         /// Returns the angle expressed in radians between -Pi and Pi.
         /// Angle is always positive
         /// </summary>
-        private static float WrapAngle(float radians)
+        public static float WrapAngle(float radians)
         {
             while (radians < -MathHelper.Pi)
             {
