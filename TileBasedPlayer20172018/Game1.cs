@@ -57,9 +57,13 @@ namespace Tiler
 
         //Audio
         Song backgroundMusic;
-        //sauce
+        
         //Sound fx
         SoundEffect[] sfx = new SoundEffect[5];
+
+        //Screens
+        Texture2D gameOver;
+        Texture2D victory;
 
         public Game1()
         {
@@ -190,6 +194,11 @@ namespace Tiler
             sfx[2] = Content.Load<SoundEffect>(@"Audio/Explosion"); //Projectile Explosion
             sfx[3] = Content.Load<SoundEffect>(@"Audio/Ching"); //Victory
             sfx[4] = Content.Load<SoundEffect>(@"Audio/Error"); //Fail
+
+            //Screens
+            victory = Content.Load<Texture2D>(@"Images/Victory");
+            gameOver = Content.Load<Texture2D>(@"Images/GameOver");
+
             
         }
 
@@ -262,6 +271,11 @@ namespace Tiler
             // TODO: Add your drawing code here
 
             base.Draw(gameTime);
+
+            if(player.Health <= 0)
+            {
+                
+            }
         }
         
     }
