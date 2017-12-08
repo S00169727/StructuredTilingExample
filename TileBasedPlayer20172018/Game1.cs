@@ -3,8 +3,10 @@ using CameraNS;
 using Engine.Engines;
 using Helpers;
 using Microsoft.Xna.Framework;
+using Microsoft.Xna.Framework.Audio;
 using Microsoft.Xna.Framework.Graphics;
 using Microsoft.Xna.Framework.Input;
+using Microsoft.Xna.Framework.Media;
 using System.Collections.Generic;
 using TileBasedPlayer20172018;
 using Tiler;
@@ -52,6 +54,12 @@ namespace Tiler
         {2,2,3,2,2,2,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,3,2,2,2,2,2,3,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2,2},
         {5,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0},
     };
+
+        //Audio
+        Song backgroundMusic;
+
+        //Sound fx
+        SoundEffect[] sfx = new SoundEffect[5];
 
         public Game1()
         {
@@ -169,6 +177,20 @@ namespace Tiler
                 sentryList[i].Health = 20;
             }
             // TODO: use this.Content to load your game content here
+
+            //Background 
+            backgroundMusic = Content.Load<Song>(@"Audio/bckGroundMusic");
+            MediaPlayer.Play(backgroundMusic);
+            MediaPlayer.Volume = 0.4f;
+            MediaPlayer.IsRepeating = true;
+
+            //Sound FX
+            sfx[0] = Content.Load<SoundEffect>(@"Audio/Explosion 2"); //Player Shot
+            sfx[1] = Content.Load<SoundEffect>(@"Audio/Beep"); //Sentry Shot
+            sfx[2] = Content.Load<SoundEffect>(@"Audio/Explosion"); //Projectile Explosion
+            sfx[3] = Content.Load<SoundEffect>(@"Audio/Ching"); //Victory
+            sfx[4] = Content.Load<SoundEffect>(@"Audio/Error"); //Fail
+            
         }
 
         public void SetColliders(TileType t)

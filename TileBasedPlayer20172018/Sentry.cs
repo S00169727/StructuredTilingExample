@@ -75,22 +75,23 @@ namespace Tiler
         }
         public override void Update(GameTime gametime)
         {
-        if (isAlive)
-        {
-            if (sentryProjectile != null && sentryProjectile.ProjectileState == Projectile.PROJECTILE_STATE.STILL)
+            if (isAlive)
             {
-                sentryProjectile.PixelPosition = this.PixelPosition;
-                sentryProjectile.hit = false;
-                // fire the rocket and it looks for the target
-                if (following && previousAngleOfRotation == angleOfRotation)
-                    sentryProjectile.fire(target);
+                if (sentryProjectile != null && sentryProjectile.ProjectileState == Projectile.PROJECTILE_STATE.STILL)
+                {
+                    sentryProjectile.PixelPosition = this.PixelPosition;
+                    sentryProjectile.hit = false;
+                    // fire the rocket and it looks for the target
+                    if (following && previousAngleOfRotation == angleOfRotation)
+                        sentryProjectile.fire(target);
+                }
+
+                previousAngleOfRotation = angleOfRotation;
+                base.Update(gametime);
             }
 
-            previousAngleOfRotation = angleOfRotation;
-            base.Update(gametime);
-        }
 
-        
-        
+
+        }
     }
 }
