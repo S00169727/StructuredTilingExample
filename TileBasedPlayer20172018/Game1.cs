@@ -180,6 +180,8 @@ namespace Tiler
                 sentryList[i].LoadProjectile(projectile);
                 sentryList[i].Health = 20;
             }
+
+
             // TODO: use this.Content to load your game content here
 
             //Background 
@@ -242,18 +244,18 @@ namespace Tiler
 
                 if (sentryList[i].sentryProjectile.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && sentryList[i].sentryProjectile.collisionDetect(player))
                 {
-                    if (!sentryList[i].sentryProjectile.hit)
+                    //if (!sentryList[i].sentryProjectile.hit)
                         player.Health -= 20;
-                    sentryList[i].sentryProjectile.hit = true;
+                    //sentryList[i].sentryProjectile.hit = true;
                 }
 
                 if (player.playerProjectle.ProjectileState == Projectile.PROJECTILE_STATE.EXPOLODING && player.playerProjectle.collisionDetect(sentryList[i]))
                 {
-                    if (!player.playerProjectle.hit)
-                    {
-                        sentryList[i].Die();
-                        player.playerProjectle.hit = true;
-                    }
+                    //if (!player.playerProjectle.hit)
+                    //{
+                     //   sentryList[i].Die();
+                     //   player.playerProjectle.hit = true;
+                    //}
                 }
             }
 
@@ -275,7 +277,15 @@ namespace Tiler
             if(player.Health <= 0)
             {
                 
+                spriteBatch.Begin();
+                spriteBatch.Draw(gameOver, GraphicsDevice.Viewport.Bounds, Color.White);
+                spriteBatch.End();
             }
+            else
+            {
+                base.Draw(gameTime);
+            }
+            base.Draw(gameTime);
         }
         
     }

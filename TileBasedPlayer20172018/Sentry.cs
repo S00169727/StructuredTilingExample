@@ -80,10 +80,10 @@ namespace Tiler
                 if (sentryProjectile != null && sentryProjectile.ProjectileState == Projectile.PROJECTILE_STATE.STILL)
                 {
                     sentryProjectile.PixelPosition = this.PixelPosition;
-                    sentryProjectile.hit = false;
+                    //sentryProjectile.hit = false;
                     // fire the rocket and it looks for the target
-                    if (following && previousAngleOfRotation == angleOfRotation)
-                        sentryProjectile.fire(target);
+                   // if (following && previousAngleOfRotation == angleOfRotation)
+                      //  sentryProjectile.fire(target);
                 }
 
                 previousAngleOfRotation = angleOfRotation;
