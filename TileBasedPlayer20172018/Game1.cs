@@ -276,7 +276,6 @@ namespace Tiler
 
             if(player.Health <= 0)
             {
-                
                 spriteBatch.Begin();
                 spriteBatch.Draw(gameOver, GraphicsDevice.Viewport.Bounds, Color.White);
                 spriteBatch.End();
